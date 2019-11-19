@@ -1,0 +1,79 @@
+#!/usr/bin/python3
+
+from math import *
+import sys
+import argparse
+import csv
+
+parser = argparse.ArgumentParser(description = 'this is my 110borwein')
+parser.add_argument("n", type = int)
+
+try:
+    args = parser.parse_args()
+except:
+    print ("error when parsing arguments")
+    exit(84)
+
+if (args.n < 0):
+    exit(84)
+
+def calculate_loop(first, second):
+    nb = 0
+    result = 1
+    while (nb <= second):
+        if (first != 0):
+            result *= sin(first / ((2 * nb) + 1)) / (first / ((2 * nb) + 1))
+        nb += 1
+    return (result)
+
+
+def rectangle(start, end, subdiv,i):
+    x = 0
+    h = (end - start)/subdiv
+    result = 0
+    while (x < 5000):
+        result += calculate_loop(x, i)
+        x += h
+    result *= 0.5
+    return (result)
+
+
+def trapezoid(start, end, subdiv,i):
+    x = 0
+    h = (end - start)/subdiv
+    result = 0
+    while (x < 5000):
+        result += (calculate_loop(x, i) + calculate_loop(x+h,i))/2
+        x += h
+    result *= 0.5
+    return (result)
+
+def simpson(i):
+    nb = 1
+    result = 0
+    result2 = 0
+    while (nb < 10000):
+        result += calculate_loop(nb * 0.5, i)
+        result2 += calculate_loop(nb * 0.5 + 0.25, i)
+        nb += 1
+    result = 5000 / 60000 * (calculate_loop(0, i) + calculate_loop(5000, i) + 2 * result + 4 * result2)
+    return (result)
+
+
+res = rectangle(0,5000,10000,args.n)
+print("Rectangles:\nI", args.n, " = ", '%.10f'%res, sep='')
+print("diff =", '%.10f'%(res - (pi / 2)))
+
+res = trapezoid(0,5000,10000, args.n)
+print("\nTrapezoids:\nI", args.n, " = ", '%.10f'%res, sep='')
+if (res - (pi / 2) > -0.0000000001 and res - (pi / 2) < 0):
+    print("diff =", '%.10f'%0)
+else:
+    print("diff =", '%.10f'%(res - (pi / 2)))
+
+res = trapezoid(0,5000,10000, args.n)
+print("\nSimpson:\nI", args.n, " = ", '%.10f'%res, sep='')
+if (res - (pi / 2) > -0.0000000001 and res - (pi / 2) < 0):
+    print("diff =", '%.10f'%0)
+else:
+    print("diff =", '%.10f'%(res - (pi / 2)))
